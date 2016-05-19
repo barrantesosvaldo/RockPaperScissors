@@ -1,0 +1,183 @@
+﻿<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            @Html.ActionLink("Rock-Paper-Scissors", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li>
+                    <a href="#" class="btn-file">
+                        <label>Upload championship file</label>
+                        <input id="txtUploadFile" type="file" accept=".txt">
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="btn-file">
+                        <label id="btnResetDatabase">Reset Database</label>
+                    </a>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                        <label>Download championship files</label>
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="#" class="btn-file">
+                                <label id="btnFile1">Example 1</label>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li>@Html.ActionLink("API Documentation", "Index", "Help", new { area = "" }, null)</li>
+
+                <li>
+                    <a href="#" class="btn-file">
+                        <label id="btnTop">Top 10 Players</label>
+                    </a>
+                </li>
+                <li>@Html.ActionLink("About", "About", "Home", new { area = "" }, null)</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="jumbotron">
+    <div>
+        <p>Top 10 Players</p>
+        @Html.ListBox("ListOfPlayers", Session["ListOfPlayers"] as List<SelectListItem>, new { @class = "form-control" })
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+    $(document).ready(function () {
+
+        // Upload Files
+        $('#txtUploadFile').on('change', function (e) {
+            var files = e.target.files;
+            var myID = 3; //uncomment this to make sure the ajax URL works
+            if (files.length > 0) {
+                if (window.FormData !== undefined) {
+                    var data = new FormData();
+                    for (var x = 0; x < files.length; x++) {
+                        data.append("file" + x, files[x]);
+                    }
+
+                    $.ajax({
+                        type: "POST",
+                        url: '/Home/UploadFile?id=' + myID,
+                        contentType: false,
+                        processData: false,
+                        data: data,
+                        success: function (result) {
+                            console.log(result);
+                            alert(result);
+                        },
+                        error: function (xhr, status, p3, p4) {
+                            var err = "Error " + " " + status + " " + p3 + " " + p4;
+                            if (xhr.responseText && xhr.responseText[0] == "{")
+                                err = JSON.parse(xhr.responseText).Message;
+                            console.log(err);
+                        }
+                    });
+                } else {
+                    alert("This browser doesn't support HTML5 file uploads!");
+                }
+            }
+        });
+
+        // Resets the Database
+        $('#btnResetDatabase').on('click', function (e) {
+            if (window.FormData !== undefined) {
+                var data = new FormData();
+
+                $.ajax({
+                    type: "POST",
+                    url: '/Home/ResetDatabase',
+                    contentType: false,
+                    processData: false,
+                    data: data,
+                    success: function (result) {
+                        console.log(result);
+                        alert(result);
+                    },
+                    error: function (xhr, status, p3, p4) {
+                        var err = "Error " + " " + status + " " + p3 + " " + p4;
+                        if (xhr.responseText && xhr.responseText[0] == "{")
+                            err = JSON.parse(xhr.responseText).Message;
+                        console.log(err);
+                    }
+                });
+            } else {
+                alert("Error");
+            }
+
+        });
+
+        // Download a file
+        $('#btnFile1').on('click', function (e) {
+            if (window.FormData !== undefined) {
+                var data = new FormData();
+
+                $.ajax({
+                    type: "POST",
+                    url: '/Home/DownloadFile?fileName=Championship1',
+                    contentType: false,
+                    processData: false,
+                    data: data,
+                    success: function (result) {
+                        console.log(result);
+                        alert("Successful but doesn't download.");
+                    },
+                    error: function (xhr, status, p3, p4) {
+                        var err = "Error " + " " + status + " " + p3 + " " + p4;
+                        if (xhr.responseText && xhr.responseText[0] == "{")
+                            err = JSON.parse(xhr.responseText).Message;
+                        console.log(err);
+                    }
+                });
+            } else {
+                alert("Error");
+            }
+        });
+
+        // Charge the top 10 players
+        $('#btnTop').on('click', function (e) {
+            if (window.FormData !== undefined) {
+                var data = new FormData();
+                var listOfPlayers = $('#ListOfPlayers');
+                $.ajax({
+                    type: "GET",
+                    url: '/Home/GetTop',
+                    contentType: false,
+                    processData: false,
+                    data: data,
+                    success: function (result) {
+                        listOfPlayers.empty();
+                        $.each(result, function (i, val) {
+                            listOfPlayers.append(
+                                $('<option></option>').val(val.Value).html(val.Text)
+                                );
+                        });
+                        console.log(result);
+                    },
+                    error: function (xhr, status, p3, p4) {
+                        var err = "Error " + " " + status + " " + p3 + " " + p4;
+                        if (xhr.responseText && xhr.responseText[0] == "{")
+                            err = JSON.parse(xhr.responseText).Message;
+                        console.log(err);
+                    }
+                });
+            } else {
+                alert("Error");
+            }
+        });
+    });
+    </script>
+}

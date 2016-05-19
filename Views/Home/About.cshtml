@@ -1,0 +1,152 @@
+﻿<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            @Html.ActionLink("Rock-Paper-Scissors", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li>
+                    <a href="#" class="btn-file">
+                        <label>Upload championship file</label>
+                        <input id="txtUploadFile" type="file" accept=".txt">
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="btn-file">
+                        <label id="btnResetDatabase">Reset Database</label>
+                    </a>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                        <label>Download championship files</label>
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="#" class="btn-file">
+                                <label id="btnFile1">Example 1</label>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li>@Html.ActionLink("API Documentation", "Index", "Help", new { area = "" }, null)</li>
+
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="jumbotron">
+    <div>
+        <p class="h2 text-center">About</p>
+        <p class="h3"> About Me</p>
+        <p class="h4 text-muted">I'm optimistic, perseverant, adaptable to change, ability to work in teams, with a lot of willing for self-improvement to grow up as a professional and achieve my personal goals to short, mid and long term.</p>
+        <br>
+        <p class="h3"> About the Solution</p>
+        <p class="h4 text-muted">It was an interesting challenge. There are several algorithms to decode the text and turn it into a Tournament with nested Tournaments if necessary, others to get the first and second place of a Tournament and to get only the winner of the Tournament too, there are 2 more for check the behavior of the others for testing.</p>
+        <br>
+        <p class="h3"> About the Technologies</p>
+        <p class="h4 text-muted">ASP.NET MVC and SQL Server are the technologies I better know. The behavior between those two are pretty easy to implement and even if I'm not used to implement WebAPIs by my self I knew it would be easier for me than using Laravel for example which I haven't used so much. The repository is the one I'm using right now in my current projects (and the onlyone I've used) so that's it.</p>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+    $(document).ready(function () {
+
+        // Upload Files
+        $('#txtUploadFile').on('change', function (e) {
+            var files = e.target.files;
+            var myID = 3; //uncomment this to make sure the ajax URL works
+            if (files.length > 0) {
+                if (window.FormData !== undefined) {
+                    var data = new FormData();
+                    for (var x = 0; x < files.length; x++) {
+                        data.append("file" + x, files[x]);
+                    }
+
+                    $.ajax({
+                        type: "POST",
+                        url: '/Home/UploadFile?id=' + myID,
+                        contentType: false,
+                        processData: false,
+                        data: data,
+                        success: function (result) {
+                            console.log(result);
+                            alert(result);
+                        },
+                        error: function (xhr, status, p3, p4) {
+                            var err = "Error " + " " + status + " " + p3 + " " + p4;
+                            if (xhr.responseText && xhr.responseText[0] == "{")
+                                err = JSON.parse(xhr.responseText).Message;
+                            console.log(err);
+                        }
+                    });
+                } else {
+                    alert("This browser doesn't support HTML5 file uploads!");
+                }
+            }
+        });
+
+        // Resets the Database
+        $('#btnResetDatabase').on('click', function (e) {
+            if (window.FormData !== undefined) {
+                var data = new FormData();
+
+                $.ajax({
+                    type: "POST",
+                    url: '/Home/ResetDatabase',
+                    contentType: false,
+                    processData: false,
+                    data: data,
+                    success: function (result) {
+                        console.log(result);
+                        alert(result);
+                    },
+                    error: function (xhr, status, p3, p4) {
+                        var err = "Error " + " " + status + " " + p3 + " " + p4;
+                        if (xhr.responseText && xhr.responseText[0] == "{")
+                            err = JSON.parse(xhr.responseText).Message;
+                        console.log(err);
+                    }
+                });
+            } else {
+                alert("Error");
+            }
+
+        });
+
+        // Download a file
+        $('#btnFile1').on('click', function (e) {
+            if (window.FormData !== undefined) {
+                var data = new FormData();
+
+                $.ajax({
+                    type: "POST",
+                    url: '/Home/DownloadFile?fileName=Championship1',
+                    contentType: false,
+                    processData: false,
+                    data: data,
+                    success: function (result) {
+                        console.log(result);
+                        alert("Successful but doesn't download.");
+                    },
+                    error: function (xhr, status, p3, p4) {
+                        var err = "Error " + " " + status + " " + p3 + " " + p4;
+                        if (xhr.responseText && xhr.responseText[0] == "{")
+                            err = JSON.parse(xhr.responseText).Message;
+                        console.log(err);
+                    }
+                });
+            } else {
+                alert("Error");
+            }
+        });
+    });
+    </script>
+}

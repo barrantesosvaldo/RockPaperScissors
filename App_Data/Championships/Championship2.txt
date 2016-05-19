@@ -1,0 +1,10 @@
+[
+	[
+		[ ["Cesar", "R"], ["Luis", "P"] ],
+		[ ["Randall", "R"], ["Alejandro", "R"] ],
+        ], 
+	[ 
+		[ ["Bryan", "R"], ["Osvaldo", "P"] ],
+		[ ["Francisco", "S"], ["Daniel", "S"] ]
+	]
+]
